@@ -34,6 +34,7 @@ class ViewController: UIViewController {
      => guard let을 통해서 해결
      3. 키/몸무게 범위가 이상한 경우
      => case문을 통해서 조정
+     
      */
     
     override func viewDidLoad() {
