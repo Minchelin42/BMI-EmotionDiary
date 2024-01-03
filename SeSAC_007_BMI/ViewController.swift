@@ -28,6 +28,7 @@ class ViewController: UIViewController {
     @IBOutlet var randomButton: UIButton!
     @IBOutlet var resultButton: UIButton!
     
+    //브랜치바꿈
     /* 체크리스트
      1. 키/몸무게에 숫자가 아닌 다른 것을 입력했을 경우
      2. 공백이나 빈칸 처리
