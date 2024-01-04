@@ -248,20 +248,26 @@ class ViewController: UIViewController {
         titleLabel.text = "BMI Calculator"
         titleLabel.font = .systemFont(ofSize: 27, weight: .bold)
         
-        let nickName = UserDefaults.standard.string(forKey: "name")!
+        let nickName = UserDefaults.standard.string(forKey: "name")
         let BMI = UserDefaults.standard.double(forKey: "bmi")
         
         let stringBMI = String(format: "%.1f", BMI)
         
-        if nickName != "" {
-            if BMI != 0.0 {
-                subTitleLabel.text = "\(nickName)님의\n최근 BMI 지수는\n\(stringBMI)입니다"
+        if let nickName {
+            let name = nickName
+            if name == "" {
+                subTitleLabel.text = "당신의 BMI 지수를 \n알려드릴게요."
             } else {
-                subTitleLabel.text = "\(nickName)님의 BMI 지수를 알려드릴게요"
+                if BMI != 0.0 {
+                    subTitleLabel.text = "\(nickName)님의\n최근 BMI 지수는\n\(stringBMI)입니다"
+                } else {
+                    subTitleLabel.text = "\(nickName)님의 BMI 지수를 알려드릴게요"
+                }
             }
         } else {
             subTitleLabel.text = "당신의 BMI 지수를 \n알려드릴게요."
         }
+        
         
         subTitleLabel.numberOfLines = 0
         subTitleLabel.font = .systemFont(ofSize: 16, weight: .regular)
