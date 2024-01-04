@@ -40,6 +40,9 @@ class ViewController: UIViewController {
         navigationItem.title = "감정 다이어리"
         navigationItem.leftBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "list.bullet"), style: .plain, target: self, action: #selector(leftBarButtonClicked))
         navigationItem.leftBarButtonItem?.tintColor = .black
+        
+        navigationItem.rightBarButtonItem = UIBarButtonItem(image: UIImage(systemName: "arrow.clockwise"), style: .plain, target: self, action: #selector(rightBarButtonClicked))
+        navigationItem.rightBarButtonItem?.tintColor = .black
     }
     
     @IBAction func emotionTapped(_ sender: UIButton) {
@@ -60,6 +63,15 @@ class ViewController: UIViewController {
     
     @objc func leftBarButtonClicked() {
         print("leftBarButtonClicked")
+    }
+    
+    @objc func rightBarButtonClicked() {
+        print("모든 count를 0으로 재설정")
+        
+        for index in 0...labelCount.count - 1 {
+            UserDefaults.standard.set(0, forKey: "count\(index + 1)")
+            emotionLabel[index].text = "\(labelTitle[index]) \(UserDefaults.standard.integer(forKey: "count\(index + 1)"))"
+        }
     }
     
     func setButtonImage(_ buttonList: [UIButton]) {
