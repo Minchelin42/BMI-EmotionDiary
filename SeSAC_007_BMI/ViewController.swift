@@ -14,48 +14,84 @@ class ViewController: UIViewController {
     
     @IBOutlet var imageView: UIImageView!
     
+    @IBOutlet var nameLabel: UILabel!
     @IBOutlet var heightLabel: UILabel!
     @IBOutlet var weightLabel: UILabel!
     
+    @IBOutlet var nameView: UIView!
     @IBOutlet var heightView: UIView!
     @IBOutlet var weightView: UIView!
     
+    @IBOutlet var nameTextField: UITextField!
     @IBOutlet var heightTextField: UITextField!
     @IBOutlet var weightTextField: UITextField!
-    
     
     @IBOutlet var hideButton: UIButton!
     @IBOutlet var randomButton: UIButton!
     @IBOutlet var resultButton: UIButton!
-    
-    //브랜치바꿈
-    /* 체크리스트
-     1. 키/몸무게에 숫자가 아닌 다른 것을 입력했을 경우
-     2. 공백이나 빈칸 처리
-     => guard let을 통해서 해결
-     3. 키/몸무게 범위가 이상한 경우
-     => case문을 통해서 조정
-     
-     */
+    @IBOutlet var resetButton: UIButton!
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         topViewDesign()
         
+        inputLabelDesign(nameLabel, text: "성함이 어떻게 되시나요?")
         inputLabelDesign(heightLabel, text: "키가 어떻게 되시나요?")
         inputLabelDesign(weightLabel, text: "몸무게는 어떻게 되시나요?")
         
+        nameTextField.borderStyle = .none
+        
         textFieldDesign(heightTextField)
         textFieldDesign(weightTextField)
+        
+        textFieldViewDesign(nameView)
         textFieldViewDesign(heightView)
         textFieldViewDesign(weightView)
         
         hideButtonDesign()
         randomButtonDesign()
         resultButtonDesign()
+        resetButtonDesign()
+        
+        setUserInfo()
   
     }
+    
+    func setUserInfo() {
+        let myName = UserDefaults.standard.string(forKey: "name")
+        let myHeight = UserDefaults.standard.double(forKey: "height")
+        let myWeight = UserDefaults.standard.double(forKey: "weight")
+        
+        nameTextField.text = myName
+        
+        if myHeight == 0.0 && myWeight == 0.0 {
+            heightTextField.text = ""
+            weightTextField.text = ""
+        } else if myHeight == 0.0 {
+            heightTextField.text = ""
+            weightTextField.text = "\(myWeight)"
+        } else if myWeight == 0.0 {
+            heightTextField.text = "\(myHeight)"
+            weightTextField.text = ""
+        } else {
+            heightTextField.text = "\(myHeight)"
+            weightTextField.text = "\(myWeight)"
+        }
+    }
+    
+    
+    @IBAction func inputClear(_ sender: UITextField) {
+        // 2개의 정보 중 한가지만 입력 후 앱을 종료하더라도 저장을 해놓기 위함
+        if let height = Double(heightTextField.text ?? ""){
+            UserDefaults.standard.set(height, forKey: "height")
+        }
+        
+        if let weight = Double(weightTextField.text ?? "") {
+            UserDefaults.standard.set(weight, forKey: "weight")
+        }
+    }
+    
     @IBAction func viewTapped(_ sender: UITapGestureRecognizer) {
         view.endEditing(true)
     }
@@ -73,7 +109,11 @@ class ViewController: UIViewController {
             return
         }
         
+        
         let result = "\(getBMI(height: height / 100, weight: weight))"
+        
+        UserDefaults.standard.set(height, forKey: "height")
+        UserDefaults.standard.set(weight, forKey: "weight")
 
         let alert = UIAlertController(title: "[ 결과 ]", message: "\(result)", preferredStyle: .alert)
         
@@ -83,19 +123,49 @@ class ViewController: UIViewController {
         
         present(alert, animated: true)
         
-        heightTextField.text = ""
-        weightTextField.text = ""
+        topViewDesign()
     }
     
     @IBAction func randomButtonTapped(_ sender: UIButton) {
         
         let weight = String(format: "%.1f", Double.random(in: 40...120))
         let height = String(format: "%.1f", Double.random(in: 150...200))
-
-        //print(height, weight)
         
         heightTextField.text = height
         weightTextField.text = weight
+    }
+    
+    @IBAction func nameInput(_ sender: UITextField) {
+        // Did end on Exit
+        view.endEditing(true)
+    }
+    
+    @IBAction func nameInputClear(_ sender: Any) {
+        // Editing Did End
+        UserDefaults.standard.set(nameTextField.text!, forKey: "name")
+        topViewDesign()
+    }
+    
+    @IBAction func resetButtonTapped(_ sender: UIButton) {
+
+        let alert = UIAlertController(title: "데이터 전체 삭제", message: "삭제하시면 복구하실 수 없습니다\n삭제를 진행하시겠습니까?", preferredStyle: .alert)
+
+        let DeleteButton = UIAlertAction(title: "삭제", style: .destructive) { action in
+            UserDefaults.standard.set("", forKey: "name")
+            UserDefaults.standard.set(0.0, forKey: "bmi")
+            UserDefaults.standard.set(0.0, forKey: "height")
+            UserDefaults.standard.set(0.0, forKey: "weight")
+            
+            self.topViewDesign()
+            self.setUserInfo()
+        }
+        let CancelButton = UIAlertAction(title: "취소", style: .cancel)
+        
+        alert.addAction(DeleteButton)
+        alert.addAction(CancelButton)
+
+        present(alert, animated: true)
+    
     }
     
     @IBAction func hideButtonTapped(_ sender: UIButton) {
@@ -119,6 +189,9 @@ class ViewController: UIViewController {
     
     func getBMI(height: Double, weight: Double) -> String{
         let BMI = weight / (height * height)
+        
+        UserDefaults.standard.set(BMI, forKey: "bmi")
+        
         let stringBMI = String(format: "%.1f", BMI)
         
         var result = ""
@@ -149,7 +222,15 @@ class ViewController: UIViewController {
         resultButton.layer.cornerRadius = 15
         resultButton.setTitle("결과 확인", for: .normal)
         resultButton.setTitleColor(.white, for: .normal)
-        resultButton.titleLabel?.font = .systemFont(ofSize: 20, weight: .medium)
+        resultButton.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
+    }
+    
+    func resetButtonDesign() {
+        resetButton.backgroundColor = UIColor(named: "resetBT")
+        resetButton.layer.cornerRadius = 15
+        resetButton.setTitle("데이터 전체 삭제", for: .normal)
+        resetButton.setTitleColor(.white, for: .normal)
+        resetButton.titleLabel?.font = .systemFont(ofSize: 16, weight: .medium)
     }
     
     func textFieldViewDesign(_ view: UIView){
@@ -166,7 +247,22 @@ class ViewController: UIViewController {
     func topViewDesign() {
         titleLabel.text = "BMI Calculator"
         titleLabel.font = .systemFont(ofSize: 27, weight: .bold)
-        subTitleLabel.text = "당신의 BMI 지수를 \n알려드릴게요."
+        
+        let nickName = UserDefaults.standard.string(forKey: "name")!
+        let BMI = UserDefaults.standard.double(forKey: "bmi")
+        
+        let stringBMI = String(format: "%.1f", BMI)
+        
+        if nickName != "" {
+            if BMI != 0.0 {
+                subTitleLabel.text = "\(nickName)님의\n최근 BMI 지수는\n\(stringBMI)입니다"
+            } else {
+                subTitleLabel.text = "\(nickName)님의 BMI 지수를 알려드릴게요"
+            }
+        } else {
+            subTitleLabel.text = "당신의 BMI 지수를 \n알려드릴게요."
+        }
+        
         subTitleLabel.numberOfLines = 0
         subTitleLabel.font = .systemFont(ofSize: 16, weight: .regular)
         
