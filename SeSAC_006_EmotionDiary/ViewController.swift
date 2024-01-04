@@ -8,9 +8,7 @@
 import UIKit
 
 class ViewController: UIViewController {
-    
-    // UserDefaults를 활용하여 감정 횟수가 영구적으로 유지되도록 설정하기
-    
+
     @IBOutlet var emotionButton: [UIButton]!
     @IBOutlet var emotionLabel: [UILabel]!
     @IBOutlet var backgroundImage: UIImageView!
